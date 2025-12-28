@@ -1,0 +1,7 @@
+-include core.h
+-include input.h
+-include graphics.h
+-include playground.h
+-include debug_font.h
+-include strconv.h
+-include <string.h>
