@@ -14,6 +14,7 @@ typedef uint16_t	u16;
 
 typedef int32_t	i32;
 typedef uint32_t	u32;
+typedef u32 b32;
 
 typedef int64_t	i64;
 typedef uint64_t	u64;
@@ -31,6 +32,8 @@ struct string8 {
 };
 
 u32 swap_bytes_u32(u32 n);
+u16 swap_bytes_u16(u16 n);
+u32 gcd_u32(u32 x, u32 y);
 
 #define unused(x) (void)(x)
 #define min(x, y) ((x) < (y) ? (x) : (y))
@@ -45,4 +48,9 @@ const union {
 } endian = { 1 };
 #define IS_BE() (endian.c == 0)
 
+#define swap_ints(i1, i2) do {  \
+    i1 = i1 ^ i2;               \
+    i2 = i2 ^ i1;               \
+    i1 = i1 ^ i2;               \
+} while (0)
 

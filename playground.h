@@ -17,7 +17,12 @@ u32 playground_colors[playground_color_size] = {
   [playground_color_pine] = 0x286983ff,
 };
 
-void playground_init(u64 ctime, u32 refres_rate, u32 target_fps);
+void playground_init(
+    memory_arena *arena,
+    u64 ctime,
+    u32 refres_rate,
+    u32 target_fps
+);
 void playground_update_and_render(
     u8 *buffer,
     i32 width,

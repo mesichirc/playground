@@ -1,6 +1,6 @@
 #/bin/sh
 
-CC=gcc
+CC=clang
 LFLAGS="-lX11 -lXrandr -lm"
 BUNDLE="./playground"
 EXE="plg"
@@ -24,7 +24,9 @@ case $1 in
     ;;
   'build')
     prepare_fonts
-    $CC -g -o "$BUNDLE/$EXE" $LFLAGS main.c
+    rm -fr $BUNDLE/assets
+    cp -fr ./assets "$BUNDLE/assets"
+    clang -g -o "$BUNDLE/$EXE" $LFLAGS main.c
     ;;
   'prepare_fonts')
     prepare_fonts

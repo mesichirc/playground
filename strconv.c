@@ -62,4 +62,5 @@ strconv_f32_to_string8(string8 str, f32 n, i32 p)
   }
   str.size = offset;
   memcpy(str.base, maxbuf, str.size);
+  return str;
 }
