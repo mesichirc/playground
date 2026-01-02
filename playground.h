@@ -9,7 +9,7 @@ enum playground_color_tokens {
 };
 
 u32 playground_colors[playground_color_size] = {
-  [playground_color_text] = 0x575279ff,
+  [playground_color_text] = 0xe0def4ff,
   [playground_color_base] = 0xfaf4edff,
   [playground_color_love] = 0xb4637aff,
   [playground_color_gold] = 0xea9d34ff,

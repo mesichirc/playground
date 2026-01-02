@@ -1,23 +1,23 @@
 #include <fcntl.h>
-#include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <stdbool.h>
+#include <assert.h>
 
-#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/io.h>
-#include <sys/mman.h>
 
 #if (defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64))
 #include <emmintrin.h>
 #elif defined(__aarch64__)
 #include <arm_neon.h>
 #endif
+
+#ifndef UNITY_BUILD
 #include "core.h"
 #include "platform.h"
 #include "memory.h"
@@ -26,14 +26,16 @@
 #include "graphics.h"
 #include "animation.h"
 #include "ppm.h"
-#define RGFW_IMPLEMENTATION
-#include "./external/RGFW.h"
-// #define STBI_ONLY_PNG
-#define STB_IMAGE_IMPLEMENTATION
-// #define STBI_NO_STDIO
-#include "./external/stb_image.h"
 #include "playground.h"
 #include "debug_font.h"
+#endif
+
+#define RGFW_IMPLEMENTATION
+#include "./external/RGFW.h"
+#define STBI_ONLY_PNG
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_NO_STDIO
+#include "./external/stb_image.h"
 
 #include "core.c"
 #include "memory.c"
@@ -43,8 +45,8 @@
 #include "ppm.c"
 #include "animation.c"
 
-#define WINDOW_WIDTH 1600
-#define WINDOW_HEIGHT 800
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 768
 #define BYTES_PER_PIXEL 4
 
 u8 *buffer = nil;
@@ -178,10 +180,43 @@ main()
     ihandle.prev = inputs + prev_input;
     prev_input = input;
     input = (input + 1) & 1;
+    input_state *current_input = inputs + input;
 
+    memset(current_input, 0, sizeof(input_state));
     while (RGFW_window_checkEvent(win, &event)) {
       if (event.type == RGFW_quit) break;
       i32 mouse_x, mouse_y;
+      switch (event.type) {
+        case RGFW_keyPressed:
+          current_input->flag |= input_flag_key_pressed;
+          current_input->key_codes[event.key.value] = event.key.value;
+          current_input->key_mod = event.key.mod;
+          
+          break;
+        case RGFW_keyReleased:
+          current_input->flag |= input_flag_key_released;
+          current_input->key_codes[event.key.value] = event.key.value;
+          current_input->key_mod = event.key.mod;
+          break;
+        case RGFW_mouseButtonPressed:
+          current_input->flag |= input_mouse_btn_pressed_flag;
+          current_input->mouse_button = event.button.value;
+          break;
+        case RGFW_mouseButtonReleased:
+          current_input->flag |= input_mouse_btn_released_flag;
+          current_input->mouse_button = event.button.value;
+          break;
+        case RGFW_mouseScroll:
+          current_input->flag |= input_mouse_scroll_flag;
+          current_input->delta_x = event.scroll.x;
+          current_input->delta_y = event.scroll.y;
+          break;
+        case RGFW_mousePosChanged:
+          current_input->flag |= input_mouse_position_changed_flag;
+          current_input->mouse_x = event.mouse.x;
+          current_input->mouse_y = event.mouse.y;
+          break;
+      }
       RGFW_window_getMouse(win, &mouse_x, &mouse_y);
       if (event.type == RGFW_windowResized) {
         RGFW_window_getSize(win, &window_width, &window_height);
@@ -195,13 +230,13 @@ main()
 
     playground_update_and_render(buffer, window_width, window_height, &ihandle, current_time_ms(), fps);
     u64 elapsed_ns = monotonic_time_ns() - startframe;
-    /*
-    assert(elapsed_ns < ns_per_frame);
+   
+    // assert(elapsed_ns < ns_per_frame);
     while (ns_per_frame > elapsed_ns) {
       sleep_ns(ns_per_frame - elapsed_ns);
       elapsed_ns = monotonic_time_ns() - startframe;
     }
-    */
+    
     fps = (f32)((f64)1000000000.0 / (f64)elapsed_ns);
     RGFW_window_blitSurface(win, surface); 
   }

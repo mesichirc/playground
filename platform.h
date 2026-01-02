@@ -1,4 +1,3 @@
-
 u32 platform_pagesize(void);
 void* platform_memory_reserve(u64 size);
 b32 platform_memory_commit(void *ptr, u64 size);

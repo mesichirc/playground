@@ -14,6 +14,8 @@ graphics_color_unpack(u32 color, u8 buf[graphics_color_part_comps])
   buf[graphics_color_part_b] = (u8)((color >> 16) & 0xFF);
   buf[graphics_color_part_g] = (u8)((color >> 8) & 0xFF);
   buf[graphics_color_part_r] = (u8)((color >> 0) & 0xFF);
+
+  return color;
 }
 
 u8 
@@ -38,6 +40,9 @@ graphics_mix_colors(u32 c1, u32 c2)
 void 
 graphics_clip_rect(graphics_rect *rect, graphics_rect clip)
 {
+  rect->x = max(0, rect->x);
+  rect->y = max(0, rect->y);
+
   i32 min_x = clip.x;
   i32 max_x = clip.x + clip.w;
   i32 min_y = clip.y;
@@ -57,23 +62,27 @@ graphics_clip_rect(graphics_rect *rect, graphics_rect clip)
   rect->h = max(0, origin_y1 - origin_y0);
 }
 
-static void
+void
 graphics_draw_rect_opaque(graphics_bitmap *canvas, graphics_rect *rect, u32 color)
 {
- u32 stride = canvas->stride;
- u32 scale = canvas->scale;
- u32 y0 = rect->y * scale;
- u32 y1 = (rect->y + rect->h) * scale;
- u32 x0 = rect->x * scale;
- u32 x1 = (rect->x + rect->w) * scale;
- u32 *memory = (u32 *)canvas->memory;
- // TODO: figure out faster alternative for setting ints to array, maybe something like SIMD for cases where stride equals width
- for (u32 y = y0; y < y1; y += 1) {
-   for (u32 x = x0; x < x1; x += 1) {
-     u32 index = graphics_get_pixel(x, y, stride, scale);
-     memory[index] = color;
-   } 
- }
+  u32 scale = canvas->scale;
+  u32 stride = canvas->stride * scale;
+  u32 y0 = max(rect->y * scale, 0);
+  u32 y1 = (rect->y + rect->h) * scale;
+  u32 x0 = max(rect->x * scale, 0);
+  u32 x1 = (rect->x + rect->w) * scale;
+  u32 *memory = (u32 *)canvas->memory;
+  for (u32 x = x0; x < x1; x += 1) {
+    u32 index = graphics_get_pixel(x, y0, stride, 1);
+    memory[index] = color;
+  }
+  u32 size = (x1 - x0) * 4;
+  u32 *from = memory + x0 + y0 * stride;
+  u32 *dest = memory + x0 + y0 * stride; 
+  for (u32 y = y0 + 1; y < y1; y += 1) {
+    dest += stride;
+    memcpy(dest, from, size);
+  }
 }
 
 void 
@@ -83,8 +92,8 @@ graphics_draw_rect(graphics_bitmap *canvas, i32 x, i32 y, u32 w, u32 h, u32 colo
   graphics_rect clip;
   u32 cwidth = canvas->width;
   u32 cheight = canvas->height;
-  rect.x = (x < 0 ? cwidth + x : x);
-  rect.y = (y < 0 ? cheight + y : y);
+  rect.x = x;
+  rect.y = y;
   rect.w = w;
   rect.h = h;
 
@@ -92,6 +101,13 @@ graphics_draw_rect(graphics_bitmap *canvas, i32 x, i32 y, u32 w, u32 h, u32 colo
   clip.y = 0;
   clip.w = cwidth;
   clip.h = cheight;
+
+  if (x < 0) {
+    rect.w += x;
+  }
+  if (y < 0) {
+    rect.h += y;
+  }
 
   graphics_clip_rect(&rect, clip);
   if (rect.w == 0 || rect.h == 0) {
@@ -621,12 +637,19 @@ graphics_draw_triangle(graphics_bitmap *canvas, graphics_vertex v0, graphics_ver
   }
 }
 
+void
+graphics_print_rect(graphics_rect rect)
+{
+  printf("GRect{x=%d, y=%d, width=%d, height=%d}\n", rect.x, rect.y, rect.w, rect.h);
+}
+
 void 
 graphics_draw_rect_image(
     graphics_bitmap *canvas, 
     i32 x, i32 y, u32 w, u32 h, 
     graphics_bitmap *bitmap,
-    b32 uniform_scale
+    b32 uniform_scale,
+    b32 right_to_left
 )
 {
   f32 aspect_ratio = (f32)bitmap->width / (f32)bitmap->height;
@@ -644,8 +667,8 @@ graphics_draw_rect_image(
   graphics_rect clip;
   u32 cwidth = canvas->width;
   u32 cheight = canvas->height;
-  rect.x = (x < 0 ? cwidth + x : x);
-  rect.y = (y < 0 ? cheight + y : y);
+  rect.x = x;
+  rect.y = y;
   rect.w = w;
   rect.h = h;
 
@@ -654,32 +677,38 @@ graphics_draw_rect_image(
   clip.w = cwidth;
   clip.h = cheight;
 
+  if (x < 0) {
+    rect.w += x;
+  }
+  if (y < 0) {
+    rect.h += y;
+  }
+
   graphics_clip_rect(&rect, clip);
+  graphics_print_rect(rect);
   if (rect.w == 0 || rect.h == 0) {
     return;
   }
   u32 stride = canvas->stride;
   u32 scale = canvas->scale;
-  u32 y0 = rect.y * scale;
-  u32 y1 = (rect.y + rect.h) * scale;
-  u32 x0 = rect.x * scale;
-  u32 x1 = (rect.x + rect.w) * scale;
+  i32 y0 = rect.y * scale;
+  i32 y1 = (rect.y + rect.h) * scale;
+  i32 x0 = rect.x * scale;
+  i32 x1 = (rect.x + rect.w) * scale;
   u32 *memory = (u32 *)canvas->memory; 
   u32 *texture_mem = (u32 *)bitmap->memory;
+  i32 orig_x = x;
+  i32 orig_y = y;
 
-  u32 texture_x_delta = bitmap->width / scale;
-  u32 texture_x_start = x0*texture_x_delta;
-  u32 texture_x = texture_x_start; 
-  for (u32 y = y0; y < y1; y += 1) {
-    for (u32 x = x0; x < x1; x += 1) {
-      u32 texture_x = (x - x0) * texture_x_delta;
-      u32 texture_y = (y - y0) * bitmap->height / h / scale;
+  for (i32 y = y0; y < y1; y += 1) {
+    for (i32 x = x0; x < x1; x += 1) {
+      i32 x2 = x - x0;
+      i32 texture_x = (x - orig_x) * bitmap->width / w / scale;
+      i32 texture_y = (y - orig_y) * bitmap->height / h / scale;
       u32 pixel = graphics_get_pixel(x, y, stride, scale);
       u32 prev_color = memory[pixel];
-      u32 texture_color = texture_mem[graphics_get_pixel((texture_x / w) % bitmap->width, texture_y, bitmap->stride, 1)];
+      u32 texture_color = texture_mem[graphics_get_pixel(right_to_left ? bitmap->width - texture_x : texture_x, texture_y, bitmap->stride, 1)];
       memory[pixel] = graphics_mix_colors(prev_color, texture_color);
-      texture_x -= texture_x_delta;
     }
-    texture_x = texture_x_start;
   }
 }

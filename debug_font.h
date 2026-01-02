@@ -25,7 +25,7 @@ char font[] = {
   31, 114, 66, 8, 1, 0, 252, 0, 
   63, 70, 23, 227, 7, 0, 252, 0, 
   63, 126, 8, 225, 7, 0, 0, 0, 
-  192, 24, 96, 12, 0, 0, 0, 0, 
+  0, 24, 3, 140, 1, 0, 0, 0, 
   192, 24, 96, 12, 17, 0, 0, 0, 
   0, 17, 65, 16, 0, 0, 0, 0, 
   0, 124, 240, 1, 0, 0, 0, 0, 
@@ -259,7 +259,7 @@ char* getglyph(int cp)
    case 122:
      return font + 672;
   }
-}
+  return font;}
 #define GLYPH_SIZE 8
 int glyphscount = sizeof(font) / GLYPH_SIZE;
 #define LETTER_WIDTH 5

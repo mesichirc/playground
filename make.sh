@@ -17,17 +17,26 @@ prepare_fonts()
     "./$FONTS_EXE" "$DEBUG_FONT_OUT"
 }
 
+build_linux()
+{
+	prepare_fonts
+  rm -fr $BUNDLE/assets
+  cp -fr ./assets "$BUNDLE/assets"
+  clang -g -o "$BUNDLE/$EXE" $LFLAGS linux.c
+}
+
 case $1 in
   'clear')
     rm $DEBUG_FONT_OUT
     rm "$BUNDLE/$EXE"
     ;;
-  'build')
-    prepare_fonts
-    rm -fr $BUNDLE/assets
-    cp -fr ./assets "$BUNDLE/assets"
-    clang -g -o "$BUNDLE/$EXE" $LFLAGS main.c
+  'build_linux')
+ 		build_linux   
     ;;
+	'build_linux_and_run')
+		build_linux
+		./playground/plg
+		;;
   'prepare_fonts')
     prepare_fonts
     ;;

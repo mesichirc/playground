@@ -298,12 +298,12 @@ u8 letters[] = {
   0, 0, 0, 0, 0,
   // :
   0, 0, 0, 0, 0,
-  0, 1, 1, 0, 0,
-  0, 1, 1, 0, 0,
   0, 0, 0, 0, 0,
   0, 1, 1, 0, 0,
   0, 1, 1, 0, 0,
   0, 0, 0, 0, 0,
+  0, 1, 1, 0, 0,
+  0, 1, 1, 0, 0,
   0, 0, 0, 0, 0,
   0, 0, 0, 0, 0,
   0, 0, 0, 0, 0,
@@ -1101,6 +1101,7 @@ main(int argc, char *argv[])
     fprintf(file, "     return font + %d;\n", i * 8);
   }
   fprintf(file, "  }\n");
+  fprintf(file, "  return font;");
   fprintf(file, "}\n");
   fprintf(file, "#define GLYPH_SIZE 8\n");
   fprintf(file, "int glyphscount = sizeof(font) / GLYPH_SIZE;\n");

@@ -23,14 +23,19 @@ struct playground_state {
 
 #define FOX_START_X 100
 
+i32 rect_x = 0;
+#define RECT_X_MIN -300
+#define RECT_X_MAX 1280
+
 static playground_state state;
 
 void
-fox_animation_setup(animation_sprite_definition *animation, u32 row, u32 frame_count) 
+fox_animation_setup(animation_sprite_definition *animation, u32 row, u32 frame_count, f32 duration) 
 {
+  animation_sprite_stop(animation);
   animation->frame_count = frame_count;
   for (int i = 0; i < frame_count; i += 1) {
-    animation->durations[i] = 120;
+    animation->durations[i] = duration;
     animation->columns[i] = (u8)i;
     animation->rows[i] = row;
   }
@@ -63,7 +68,7 @@ playground_init(memory_arena *arena, u64 ctime, u32 refres_rate, u32 target_fps)
     state.fox_sprites.stride = w;
     state.fox_sprites.bytes_per_pixel = 4;
 
-    fox_animation_setup(&state.fox_animation, 1, 14);
+    fox_animation_setup(&state.fox_animation, 1, 14, 120);
     state.fox_animation.durations[0]  = 1.2 * state.fox_animation.durations[0];
     state.fox_animation.durations[13] = 1.2 * state.fox_animation.durations[13];
     state.fox_animation.durations[12] = 1.2 * state.fox_animation.durations[12];
@@ -119,6 +124,16 @@ playground_init(memory_arena *arena, u64 ctime, u32 refres_rate, u32 target_fps)
   animation_duration_stop(&state.walk_animation_value);
 }
 
+b32 is_moving = false;
+typedef enum moving_directions moving_directions;
+enum moving_directions { 
+  right = 0,
+  left = 1,
+};
+moving_directions moving_direction = right;
+u8 last_key_pressed = 0;
+
+
 void 
 playground_update_and_render(
     u8 *buffer,
@@ -129,6 +144,7 @@ playground_update_and_render(
     f32 fps
 )
 {
+  
   f32 delta_time = (f32)(timestamp - state.current_time);
   state.current_time = timestamp;
   graphics_bitmap canvas;
@@ -155,20 +171,40 @@ playground_update_and_render(
           width,
           height, 
           &state.bg_bitmap,
-          true
+          true,
+          false
       ); 
-      graphics_draw_rect_image(&state.bg_bitmap_cached, 0, 0, canvas.width, canvas.height, &state.bg_forest, true);
-      graphics_draw_rect_image(&state.bg_bitmap_cached, 0, 0, width, height, &state.floor, true);
+      graphics_draw_rect_image(&state.bg_bitmap_cached, 0, 0, canvas.width, canvas.height, &state.bg_forest, true, false);
+      graphics_draw_rect_image(&state.bg_bitmap_cached, 0, 0, width, height, &state.floor, true, false);
     }
     memcpy(canvas.memory, state.bg_bitmap_cached.memory, canvas.width * canvas.height * 4);
     u32 y = canvas.height - state.bg_forest.height;
   }
+  input_state *input = ihandle->next;
   /** Debug text */
   {
-    graphics_point point = graphics_draw_debug_string(&canvas, 8, 8, STR8_LIT("fps:"), playground_colors[playground_color_text], 32);
+    u32 color =  playground_colors[playground_color_text];
+    graphics_point point = graphics_draw_debug_string(&canvas, 8, 8, STR8_LIT("fps:"), color, 32);
     string8 fps_string = (string8) { debug_string, sizeof(debug_string) };
     fps_string = strconv_f32_to_string8(fps_string, fps, 6);
-    graphics_draw_debug_string(&canvas, point.x, point.y, fps_string, playground_colors[playground_color_text], 32);
+    point = graphics_draw_debug_string(&canvas, point.x, point.y, fps_string, color, 32);
+    point = graphics_draw_debug_string(&canvas, point.x, point.y, STR8_LIT("  Key pressed:"), color, 32);
+    if (input->flag & input_flag_key_pressed) {
+      for (u32 i = 0; i < input_key_code_last; i += 1) {
+        if (input->key_codes[i]) {
+          last_key_pressed = i;
+          break;
+        }
+      }
+    }
+    if (input->flag & input_flag_key_released) {
+      last_key_pressed = 0;
+    }
+    if (last_key_pressed) {
+      u8 key_string[1] = { last_key_pressed };
+      string8 str = (string8) {key_string, 1};
+      graphics_draw_debug_string(&canvas, point.x, point.y, str, color, 32);
+    }
   }
 
   state.time_to_walk_transition += delta_time;
@@ -176,37 +212,34 @@ playground_update_and_render(
   u32 h_floor_scaled = h_floor * canvas.height / state.bg_bitmap.height;
   u32 y = canvas.height - 128 - h_floor_scaled;
   graphics_bitmap fox_image;
-  animation_sprite_get_bitmap(&state.fox_animation, &fox_image);
-  if (state.time_to_walk_transition < 3000.0f || state.walk_done) {
-    graphics_draw_rect_image(&canvas, state.walk_done ? 1000 : FOX_START_X, y, 128, 128, &fox_image, false); 
-  } else {
-    if (!state.walk_animation_value.is_running && !state.walk_done) {
-      animation_sprite_stop(&state.fox_animation);
-      fox_animation_setup(&state.fox_animation, 2, 8);
-      animation_duration_value_reset(&state.walk_animation_value);
-      animation_duration_start(&state.walk_animation_value);
-      animation_sprite_start(&state.fox_animation);
+  {
+    if ((input->flag & input_flag_key_pressed) && !is_moving) {
+      if (input->key_codes[input_key_code_a] || input->key_codes[input_key_code_d]) {
+        fox_animation_setup(&state.fox_animation, 2, 8, 40);
+        animation_sprite_start(&state.fox_animation);
+        moving_direction = input->key_codes[input_key_code_a] ? left : right;
+        is_moving = true;
+      }
     }
-    f32 current_walk_value = animation_duration_value_update(&state.walk_animation_value, delta_time);
-    u32 x = animation_interpolate_u32(state.from_x, state.to_x, current_walk_value);
-    graphics_draw_rect_image(&canvas, x, y, 128, 128, &fox_image, false); 
-    if (!state.walk_animation_value.is_running) {
-      state.walk_done = true;
-      animation_sprite_stop(&state.fox_animation);
-      fox_animation_setup(&state.fox_animation, 1, 14);
-      animation_sprite_start(&state.fox_animation);
+    if ((input->flag & input_flag_key_released) && is_moving) {
+      if (input->key_codes[input_key_code_a] || input->key_codes[input_key_code_d]) {
+        fox_animation_setup(&state.fox_animation, 1, 14, 120);
+        animation_sprite_start(&state.fox_animation);
+        is_moving = false;
+      }
     }
-  }
-  animation_sprite_update(&state.fox_animation, delta_time);
-
-  if (state.walk_done) {
-    u32 size = 128;
-    u32 scale = max(size / LETTER_HEIGHT, 1);
-    string8 message = STR8_LIT("Happy new year!");
-    graphics_point string_size = graphics_measure_debug_string(message, size);
-    u32 x = canvas.width / 2 - string_size.x / 2;
-    u32 y  = canvas.height / 2 - string_size.y / 2;
-    graphics_draw_debug_string(&canvas, x, y, message, 0xffffffff, size);
-
+    u32 prev_frame_index = state.fox_animation.current_frame_index;
+    animation_sprite_update(&state.fox_animation, delta_time);
+    i32 velocity = canvas.width / 200;
+    if (is_moving) {
+      if (moving_direction == right) {
+        rect_x += velocity;
+      } else {
+        rect_x -= velocity;
+      }
+    }
+    animation_sprite_get_bitmap(&state.fox_animation, &fox_image);
+    rect_x = max(min((i32)canvas.width, rect_x), RECT_X_MIN);
+    graphics_draw_rect_image(&canvas, rect_x, y, 128, 128, &fox_image, true, moving_direction); 
   }
 }
