@@ -2,6 +2,6 @@
 	{
     "directory": "/home/sichirc/sources/playground",
     "file": "linux.c",      
-		"command": "clang -I. -include=<sys/mman.h> -include=<string.h> -include=<stdbool.h> -include=core.h -include=input.h -include=graphics.h -include=playground.h -include=debug_font.h -include=strconv.h -include=memory.h -include=platform.h -include=ppm.h -include=animation.h -include=external/stb_image.h -include=core.h -std=c11 -DUNITY_BUILD -D_GNU_SOURCE -c linux.c"
+		"command": "clang -I. -c linux.c"
   }
 ]

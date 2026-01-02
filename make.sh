@@ -8,6 +8,18 @@ FONTS="fonts"
 DEBUG_FONT="$FONTS/debug.c"
 FONTS_EXE="$FONTS/debug_app"
 DEBUG_FONT_OUT="debug_font.h"
+TEMPLATE="compile_commands.template.json"
+OUTPUT="compile_commands.json"
+DIRECTORY=$(pwd)
+
+make_compile_commands()
+{
+	PLATFORM="$1"
+	sed \
+  	-e "s|{directory}|$DIRECTORY|g" \
+  	-e "s|{platform}|$PLATFORM|g" \
+  	"$TEMPLATE" > "$OUTPUT"
+}
 
 prepare_fonts()
 {
@@ -31,7 +43,8 @@ case $1 in
     rm "$BUNDLE/$EXE"
     ;;
   'build_linux')
- 		build_linux   
+		make_compile_commands "linux"
+		build_linux   
     ;;
 	'build_linux_and_run')
 		build_linux

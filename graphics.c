@@ -640,7 +640,19 @@ graphics_draw_triangle(graphics_bitmap *canvas, graphics_vertex v0, graphics_ver
 void
 graphics_print_rect(graphics_rect rect)
 {
-  printf("GRect{x=%d, y=%d, width=%d, height=%d}\n", rect.x, rect.y, rect.w, rect.h);
+	platform_print(STR8_LIT("GRect{x="));
+	string8 num_str;
+	u8 buf[64];
+	num_str.base = buf;
+	num_str.size = 64;
+	platform_print(strconv_u32_to_string8(num_str, rect.x));
+	platform_print(STR8_LIT(", y="));
+	platform_print(strconv_u32_to_string8(num_str, rect.y));
+	platform_print(STR8_LIT(", width="));
+	platform_print(strconv_u32_to_string8(num_str, rect.w));
+	platform_print(STR8_LIT(", height="));
+	platform_print(strconv_u32_to_string8(num_str, rect.h));
+	platform_print(STR8_LIT("}\n"));
 }
 
 void 

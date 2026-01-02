@@ -1,6 +1,3 @@
-#include <stdint.h>
-#include <stddef.h>
-
 #ifndef nil
 #define nil (void *)0
 #endif
@@ -23,7 +20,6 @@ typedef float	f32;
 typedef double f64;
 
 typedef uintptr_t	uptr;
-typedef size_t usize;
 
 typedef struct string8 string8;
 struct string8 {
@@ -54,3 +50,5 @@ const union {
     i1 = i1 ^ i2;               \
 } while (0)
 
+#define true 1
+#define false 0

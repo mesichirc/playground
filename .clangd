@@ -1,0 +1,27 @@
+CompileFlags: 
+  Add:
+    - -ferror-limit=10000
+    - -I.
+    - -DUNITY_BUILD
+    - -include=core.h
+    - -include=memory.h
+    - -include=platform.h
+    - -include=graphics.h
+    - -include=strconv.h
+    - -include=input.h
+    - -include=animation.h
+    - -include=ppm.h
+    - -include=playground.h
+    - -include=debug_font.h
+---
+If:
+  PathMatch: "linux\\.c$"
+CompileFlags: 
+  Add:
+    - -I.
+---
+If:
+  PathMatch: "core\\.h$"
+CompileFlags:
+  Add:
+    - -include=<stdint.h>

@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <fcntl.h>
 #include <time.h>
 #include <string.h>
@@ -19,16 +20,17 @@
 
 #ifndef UNITY_BUILD
 #include "core.h"
-#include "platform.h"
 #include "memory.h"
+#include "platform.h"
+#include "graphics.h"
 #include "strconv.h"
 #include "input.h"
-#include "graphics.h"
 #include "animation.h"
 #include "ppm.h"
 #include "playground.h"
 #include "debug_font.h"
 #endif
+
 
 #define RGFW_IMPLEMENTATION
 #include "./external/RGFW.h"
@@ -76,7 +78,6 @@ platform_memory_commit(void *ptr, u64 size)
   i32 ret = mprotect(ptr, size, PROT_READ | PROT_WRITE);
   return ret == 0;
 }
-
 b32 
 platform_memory_decommit(void *ptr, u64 size)
 {
@@ -142,6 +143,12 @@ platform_read_entire_file(char *path, u64 *size)
   *size = s.st_size;
 
   return mmap(0, s.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+}
+
+void
+platform_print(string8 str)
+{
+	printf("%.*s", (u32)str.size, (char *)str.base);
 }
 
 
