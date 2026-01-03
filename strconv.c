@@ -21,7 +21,7 @@ strconv_u32_to_buf(u8* buf, u64 *size, u32 n)
   }
 
   *size = min((STRCONV_MAX_U32_LENGTH - 1 - offset), *size);
-  memcpy(buf, maxbuf + offset + 1, *size);
+  platform_memcpy(buf, maxbuf + offset + 1, *size);
 }
 
 string8 
@@ -61,6 +61,6 @@ strconv_f32_to_string8(string8 str, f32 n, i32 p)
     p -= 1;
   }
   str.size = offset;
-  memcpy(str.base, maxbuf, str.size);
+  platform_memcpy(str.base, maxbuf, str.size);
   return str;
 }

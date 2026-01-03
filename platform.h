@@ -7,3 +7,4 @@ b32 platform_memory_release(void *ptr, u64 size);
 void* platform_read_entire_file(char *path, u64 *size);
 
 void platform_print(string8 str);
+inline void platform_memcpy(void *dest, void *source, u64 size);

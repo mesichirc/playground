@@ -1,17 +1,18 @@
 #include <stdio.h>
 #include <stdint.h>
+#ifndef UNITY_BUILD
 #include "../core.h"
+#endif
 #include "../core.c"
 #include <assert.h>
 
-
 #define LETTER_WIDTH 5
 #define LETTER_HEIGHT 10
-#define LETTER_SIZE 50
+#define LETTER_SIZE() ((LETTER_WIDTH) * (LETTER_HEIGHT))
 
 u8 letters[] = {
   // Null 0
-  1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1,
   1, 0, 0, 0, 1,
   1, 1, 1, 0, 1,
   1, 1, 0, 0, 1,
@@ -1060,6 +1061,9 @@ compressLetter(u8 *letter, u8 *out)
   }
 }
 
+#ifndef GLYPH_SIZE
+#define GLYPH_SIZE sizeof(char)
+#endif
 int
 main(int argc, char *argv[]) 
 {
@@ -1067,17 +1071,17 @@ main(int argc, char *argv[])
   FILE *file = argc > 1 ? fopen(outPath, "w") : fdopen(1, "w");
 
   size_t cpsize = sizeof(codepoints) / sizeof(codepoints[0]);
-  size_t lettersCount = sizeof(letters) / LETTER_SIZE;
-  printf("letterscount %u cpsize %u\n", lettersCount, cpsize);
+  size_t lettersCount = sizeof(letters) / LETTER_SIZE();
+  printf("letterscount %lu cpsize %lu\n", lettersCount, cpsize);
   assert(lettersCount == cpsize);
   u8 *letter = letters;
-  u8 compressedLetter[8];
+  u8 compressedLetter[GLYPH_SIZE];
 
   fprintf(file, "char font[] = {\n  ");
 
   for (int i = 0; i < lettersCount; i += 1) {
     compressLetter(letter, compressedLetter);
-    letter += LETTER_SIZE;
+    letter += LETTER_SIZE();
     for (int j = 0; j < 8; j += 1) {
       fprintf(file, "%d", compressedLetter[j]);
 
@@ -1098,15 +1102,15 @@ main(int argc, char *argv[])
   fprintf(file, "  switch (cp) {\n");
   for (int i = 0; i < cpsize; i+=1) {
     fprintf(file, "   case %d:\n", codepoints[i]);
-    fprintf(file, "     return font + %d;\n", i * 8);
+    fprintf(file, "     return font + %d;\n", (int)i * GLYPH_SIZE);
   }
   fprintf(file, "  }\n");
   fprintf(file, "  return font;");
   fprintf(file, "}\n");
-  fprintf(file, "#define GLYPH_SIZE 8\n");
+  fprintf(file, "#define GLYPH_SIZE %d\n", (int)GLYPH_SIZE);
   fprintf(file, "int glyphscount = sizeof(font) / GLYPH_SIZE;\n");
-  fprintf(file, "#define LETTER_WIDTH 5\n");
-  fprintf(file, "#define LETTER_HEIGHT 10\n");
+  fprintf(file, "#define LETTER_WIDTH %d\n", (int)LETTER_WIDTH);
+  fprintf(file, "#define LETTER_HEIGHT %d\n", (int)LETTER_HEIGHT);
 
   return 0;
 }

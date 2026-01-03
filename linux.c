@@ -1,7 +1,8 @@
+#include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 #include <fcntl.h>
 #include <time.h>
-#include <string.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <stdbool.h>
@@ -18,7 +19,6 @@
 #include <arm_neon.h>
 #endif
 
-#ifndef UNITY_BUILD
 #include "core.h"
 #include "memory.h"
 #include "platform.h"
@@ -29,7 +29,6 @@
 #include "ppm.h"
 #include "playground.h"
 #include "debug_font.h"
-#endif
 
 
 #define RGFW_IMPLEMENTATION
@@ -95,6 +94,11 @@ platform_memory_release(void *ptr, u64 size)
   return ret == 0;
 }
 
+void
+platform_memcpy(void *dest, void *source, u64 size)
+{
+	memcpy(dest, source, size);
+}
 
 static u64
 current_time_ms(void)

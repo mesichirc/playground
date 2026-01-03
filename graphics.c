@@ -81,7 +81,7 @@ graphics_draw_rect_opaque(graphics_bitmap *canvas, graphics_rect *rect, u32 colo
   u32 *dest = memory + x0 + y0 * stride; 
   for (u32 y = y0 + 1; y < y1; y += 1) {
     dest += stride;
-    memcpy(dest, from, size);
+    platform_memcpy(dest, from, size);
   }
 }
 
@@ -210,13 +210,19 @@ graphics_measure_debug_string(string8 str, u32 size)
 graphics_point 
 graphics_draw_debug_string(graphics_bitmap *canvas, i32 x, i32 y, string8 str, u32 color, u32 size)
 {
+	u32 x0 = x;
   u32 scale = max(size / LETTER_HEIGHT, 1); 
   u32 step = LETTER_WIDTH * scale + scale;
   for (int i = 0; i < str.size; i += 1) {
     if (str.base[i] == '\n') {
       y += LETTER_HEIGHT;
+			x = x0;
       continue;
     }
+		if (str.base[i] == '\t') {
+			x += 2*step;
+			continue;
+		}
     if (str.base[i] == ' ') {
       x += step;
       continue;

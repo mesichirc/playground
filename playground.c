@@ -177,7 +177,7 @@ playground_update_and_render(
       graphics_draw_rect_image(&state.bg_bitmap_cached, 0, 0, canvas.width, canvas.height, &state.bg_forest, true, false);
       graphics_draw_rect_image(&state.bg_bitmap_cached, 0, 0, width, height, &state.floor, true, false);
     }
-    memcpy(canvas.memory, state.bg_bitmap_cached.memory, canvas.width * canvas.height * 4);
+    platform_memcpy(canvas.memory, state.bg_bitmap_cached.memory, canvas.width * canvas.height * 4);
     u32 y = canvas.height - state.bg_forest.height;
   }
   input_state *input = ihandle->next;
@@ -215,7 +215,7 @@ playground_update_and_render(
   {
     if ((input->flag & input_flag_key_pressed) && !is_moving) {
       if (input->key_codes[input_key_code_a] || input->key_codes[input_key_code_d]) {
-        fox_animation_setup(&state.fox_animation, 2, 8, 40);
+        fox_animation_setup(&state.fox_animation, 2, 8, 60);
         animation_sprite_start(&state.fox_animation);
         moving_direction = input->key_codes[input_key_code_a] ? left : right;
         is_moving = true;
@@ -230,7 +230,7 @@ playground_update_and_render(
     }
     u32 prev_frame_index = state.fox_animation.current_frame_index;
     animation_sprite_update(&state.fox_animation, delta_time);
-    i32 velocity = canvas.width / 200;
+    i32 velocity = canvas.width / 300;
     if (is_moving) {
       if (moving_direction == right) {
         rect_x += velocity;

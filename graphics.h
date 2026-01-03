@@ -30,7 +30,7 @@ struct graphics_texture_vertex {
 
 typedef struct graphics_bitmap graphics_bitmap;
 struct graphics_bitmap {
-  u8 *memory;
+  u8 *memory; // |RGBA|RGBA|.....
   u32 width;
   u32 height;
   /** Offset to next y position in memory, usefull if need to create bitmap, from parent bitmap, without copying memory */
