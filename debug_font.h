@@ -57,7 +57,12 @@ char font[] = {
   49, 198, 24, 171, 2, 0, 68, 0, 
   81, 17, 66, 84, 4, 0, 196, 0, 
   49, 198, 15, 225, 3, 0, 124, 0, 
-  31, 34, 34, 194, 7, 0, 0, 0, 
+  31, 34, 34, 194, 7, 0, 24, 0, 
+  70, 8, 33, 132, 1, 0, 128, 0, 
+  32, 8, 130, 32, 0, 0, 48, 0, 
+  12, 33, 132, 16, 3, 0, 16, 0, 
+  68, 69, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 192, 7, 0, 0, 0, 
   0, 124, 248, 227, 7, 0, 0, 0, 
   0, 132, 240, 227, 7, 0, 0, 0, 
   0, 252, 16, 194, 7, 0, 0, 0, 
@@ -91,71 +96,186 @@ char* getglyph(int cp)
    case 0:
      return font + 0;
    case 33:
-     return font + 1;
-   case 34:
-     return font + 2;
-   case 35:
-     return font + 3;
-   case 36:
-     return font + 4;
-   case 37:
-     return font + 5;
-   case 38:
-     return font + 6;
-   case 92:
-     return font + 7;
-   case 40:
      return font + 8;
-   case 41:
-     return font + 9;
-   case 42:
-     return font + 10;
-   case 43:
-     return font + 11;
-   case 44:
-     return font + 12;
-   case 45:
-     return font + 13;
-   case 46:
-     return font + 14;
-   case 47:
-     return font + 15;
-   case 48:
+   case 34:
      return font + 16;
-   case 49:
-     return font + 17;
-   case 50:
-     return font + 18;
-   case 51:
-     return font + 19;
-   case 52:
-     return font + 20;
-   case 53:
-     return font + 21;
-   case 54:
-     return font + 22;
-   case 55:
-     return font + 23;
-   case 56:
+   case 35:
      return font + 24;
-   case 57:
-     return font + 25;
-   case 58:
-     return font + 26;
-   case 59:
-     return font + 27;
-   case 60:
-     return font + 28;
-   case 61:
-     return font + 29;
-   case 62:
-     return font + 30;
-   case 63:
-     return font + 31;
-   case 64:
+   case 36:
      return font + 32;
+   case 37:
+     return font + 40;
+   case 38:
+     return font + 48;
+   case 92:
+     return font + 56;
+   case 40:
+     return font + 64;
+   case 41:
+     return font + 72;
+   case 42:
+     return font + 80;
+   case 43:
+     return font + 88;
+   case 44:
+     return font + 96;
+   case 45:
+     return font + 104;
+   case 46:
+     return font + 112;
+   case 47:
+     return font + 120;
+   case 48:
+     return font + 128;
+   case 49:
+     return font + 136;
+   case 50:
+     return font + 144;
+   case 51:
+     return font + 152;
+   case 52:
+     return font + 160;
+   case 53:
+     return font + 168;
+   case 54:
+     return font + 176;
+   case 55:
+     return font + 184;
+   case 56:
+     return font + 192;
+   case 57:
+     return font + 200;
+   case 58:
+     return font + 208;
+   case 59:
+     return font + 216;
+   case 60:
+     return font + 224;
+   case 61:
+     return font + 232;
+   case 62:
+     return font + 240;
+   case 63:
+     return font + 248;
+   case 64:
+     return font + 256;
    case 65:
-     return font + 33;
+     return font + 264;
    case 66:
-     return font + 34;
+     return font + 272;
    case 67:
+     return font + 280;
+   case 68:
+     return font + 288;
+   case 69:
+     return font + 296;
+   case 70:
+     return font + 304;
+   case 71:
+     return font + 312;
+   case 72:
+     return font + 320;
+   case 73:
+     return font + 328;
+   case 74:
+     return font + 336;
+   case 75:
+     return font + 344;
+   case 76:
+     return font + 352;
+   case 77:
+     return font + 360;
+   case 78:
+     return font + 368;
+   case 79:
+     return font + 376;
+   case 80:
+     return font + 384;
+   case 81:
+     return font + 392;
+   case 82:
+     return font + 400;
+   case 83:
+     return font + 408;
+   case 84:
+     return font + 416;
+   case 85:
+     return font + 424;
+   case 86:
+     return font + 432;
+   case 87:
+     return font + 440;
+   case 88:
+     return font + 448;
+   case 89:
+     return font + 456;
+   case 90:
+     return font + 464;
+   case 91:
+     return font + 472;
+   case 134:
+     return font + 480;
+   case 93:
+     return font + 488;
+   case 94:
+     return font + 496;
+   case 95:
+     return font + 504;
+   case 97:
+     return font + 512;
+   case 98:
+     return font + 520;
+   case 99:
+     return font + 528;
+   case 100:
+     return font + 536;
+   case 101:
+     return font + 544;
+   case 102:
+     return font + 552;
+   case 103:
+     return font + 560;
+   case 104:
+     return font + 568;
+   case 105:
+     return font + 576;
+   case 106:
+     return font + 584;
+   case 107:
+     return font + 592;
+   case 108:
+     return font + 600;
+   case 109:
+     return font + 608;
+   case 110:
+     return font + 616;
+   case 111:
+     return font + 624;
+   case 112:
+     return font + 632;
+   case 113:
+     return font + 640;
+   case 114:
+     return font + 648;
+   case 115:
+     return font + 656;
+   case 116:
+     return font + 664;
+   case 117:
+     return font + 672;
+   case 118:
+     return font + 680;
+   case 119:
+     return font + 688;
+   case 120:
+     return font + 696;
+   case 121:
+     return font + 704;
+   case 122:
+     return font + 712;
+  }
+  return font;}
+#define GLYPH_SIZE 8
+int glyphscount = sizeof(font) / GLYPH_SIZE;
+#define LETTER_WIDTH 5
+#define LETTER_HEIGHT 10

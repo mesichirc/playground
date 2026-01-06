@@ -161,20 +161,15 @@ enum input_key_mod {
 
 typedef struct input_state input_state;
 struct input_state {
-  u8                  chars[512];
-  input_key_code      key_codes[input_key_code_last];
-  input_key_mod       key_mod;
-  i32                 mouse_x;
-  i32                 mouse_y;
-  u16                 chars_length;
-  input_flag          flag;
-  u8                  mouse_button;
-  f32                 delta_x;
-  f32                 delta_y;
+  u8             chars[512];
+  input_key_code key_codes[input_key_code_last];
+  input_key_mod  key_mod;
+  i32            mouse_x;
+  i32            mouse_y;
+  u16            chars_length;
+  input_flag     flag;
+  u8             mouse_button;
+  f32            delta_x;
+  f32            delta_y;
 };
 
-typedef struct input_handle input_handle;
-struct input_handle {
-  input_state *next;
-  input_state *prev;
-};

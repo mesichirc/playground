@@ -8,3 +8,6 @@ void* platform_read_entire_file(char *path, u64 *size);
 
 void platform_print(string8 str);
 inline void platform_memcpy(void *dest, void *source, u64 size);
+inline void platform_memset(void *ptr, u8 placeholder, u64 size);
+
+void *platform_load_image(void *mem, u64 size, i32 *w, i32 *h, i32 *channels, i32 desired_channels);

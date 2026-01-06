@@ -17,6 +17,25 @@ u32 playground_colors[playground_color_size] = {
   [playground_color_pine] = 0x286983ff,
 };
 
+typedef struct playground_key playground_key;
+struct playground_key {
+  int half_transition_count;
+  b32 ended_down;
+};
+
+typedef struct playground_input playground_input;
+struct playground_input {
+  union {
+    playground_key buttons[4];
+    struct {
+      playground_key up;
+      playground_key down;
+      playground_key left;
+      playground_key right;
+    };
+  };
+};
+
 void playground_init(
     memory_arena *arena,
     u64 ctime,
@@ -27,7 +46,7 @@ void playground_update_and_render(
     u8 *buffer,
     i32 width,
     i32 height,
-    input_handle *ihandle,
+    playground_input *input,
     u64 timestamp,
     f32 fps
 );

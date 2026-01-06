@@ -22,3 +22,4 @@ gcd_u32(u32 x, u32 y)
   }
   return x;
 }
+

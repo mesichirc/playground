@@ -51,7 +51,7 @@ memory_arena_push(memory_arena* arena, u64 size, b32 non_zero)
   arena->pos = new_pos;
   u8* out = (u8*)arena + pos_aligned;
   if (!non_zero) {
-    memset(out, 0, size);
+    platform_memset(out, 0, size);
   }
 
   return out;

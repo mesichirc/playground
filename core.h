@@ -14,7 +14,7 @@ typedef uint32_t	u32;
 typedef u32 b32;
 
 typedef int64_t	i64;
-typedef uint64_t	u64;
+typedef uint64_t u64;
 
 typedef float	f32;
 typedef double f64;
@@ -27,13 +27,19 @@ struct string8 {
   u64 size;
 };
 
+typedef struct slice slice;
+struct slice {
+  u8* base;
+  u64 length;
+  u64 capacity;
+};
+
 u32 swap_bytes_u32(u32 n);
 u16 swap_bytes_u16(u16 n);
 u32 gcd_u32(u32 x, u32 y);
-
 #define unused(x) (void)(x)
-#define min(x, y) ((x) < (y) ? (x) : (y))
-#define max(x, y) ((x) > (y) ? (x) : (y))
+#define min(x, y) ((x) <= (y) ? (x) : (y))
+#define max(x, y) ((x) >= (y) ? (x) : (y))
 
 #define STR8_LIT(s) (string8) { (u8*)(s), sizeof((s)) - 1 }
 
@@ -45,10 +51,19 @@ const union {
 #define IS_BE() (endian.c == 0)
 
 #define swap_ints(i1, i2) do {  \
-    i1 = i1 ^ i2;               \
-    i2 = i2 ^ i1;               \
-    i1 = i1 ^ i2;               \
+    (i1) = (i1) ^ (i2);         \
+    (i2) = (i2) ^ (i1);         \
+    (i1) = (i1) ^ (i2);         \
 } while (0)
 
 #define true 1
 #define false 0
+
+#define SLICE_SET_T(sl, T, index, item) do { \
+  *(((T *)(sl).base) + index) = (item);      \
+} while (0)
+#define SLICE_GET_T(sl, T, index) (((T *)(sl).base) + index)
+#define SLICE_HAS_T(sl, T, index) ((sl).length > (index) * sizeof(T))
+#define SLICE_LENGTH_T(sl, T) ((sl).length / sizeof(T))
+
+inline void swap(void **i1, void **i2);

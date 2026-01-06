@@ -2,6 +2,6 @@
 	{
     "directory": "/home/sichirc/sources/playground",
     "file": "linux.c",      
-		"command": "/usr/bin/clang -std=c11 -g -o playground/plg -D_GNU_SOURCE linux.c"
+		"command": "clang -I. -c linux.c"
   }
 ]

@@ -12,6 +12,12 @@ struct graphics_point {
   i32 y;
 };
 
+typedef struct graphics_vec2 graphics_vec2;
+struct graphics_vec2 {
+  f32 x;
+  f32 y;
+};
+
 typedef struct graphics_vertex graphics_vertex;
 struct graphics_vertex {
   f32 x;
