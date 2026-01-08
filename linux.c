@@ -7,7 +7,6 @@
 #include <sys/mman.h>
 #include <stdbool.h>
 #include <assert.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -20,8 +19,8 @@
 #endif
 
 #include "core.h"
+#include <math.h>
 #include "memory.h"
-#include "math.h"
 #include "platform.h"
 #include "graphics.h"
 #include "strconv.h"
@@ -33,8 +32,6 @@
 #include "pcg_random.h"
 #include "physics.h"
 
-#include "./external/XDL.h"
-#define RGFW_USE_XDL 
 #define RGFW_IMPLEMENTATION
 #include "./external/RGFW.h"
 #define STBI_ONLY_PNG
@@ -51,7 +48,6 @@
 #include "animation.c"
 #include "pcg_random.c"
 #include "physics.c"
-#include "math.c"
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
@@ -62,6 +58,11 @@ u32 windowWidth = WINDOW_WIDTH;
 u32 windowHeight = WINDOW_HEIGHT;
 
 
+i32
+floor_f32_to_i32(f32 n)
+{
+  return (i32)floorf((f32)n);
+}
 u32 
 platform_pagesize(void) {
   return (u32)sysconf(_SC_PAGESIZE);
@@ -200,7 +201,7 @@ main()
   memory_arena *playground_arena = memory_arena_create(MB(100), KB(100));
   assert(playground_arena);
 
-  RGFW_window *win = RGFW_createWindow("THE playground", 0, 0, windowWidth, windowHeight, RGFW_windowCenter | RGFW_windowNoResize | RGFW_windowScaleToMonitor);
+  RGFW_window *win = RGFW_createWindow("THE playground", 0, 0, windowWidth, windowHeight, RGFW_windowCenter | RGFW_windowNoResize | RGFW_windowScaleToMonitor | RGFW_windowNoBorder);
 
   playground_input inputs[2] = {0};
   playground_input *prev_input = inputs;
@@ -211,7 +212,7 @@ main()
   u8 *buffer = PUSH_ARRAY(arena, u8, bsize);
   RGFW_surface *surface = RGFW_createSurface(buffer, window_width, window_height, RGFW_formatRGBA8);
   RGFW_monitor mon = RGFW_window_getMonitor(win);
-  u32 target_fps = (f64)mon.mode.refreshRate / 2;
+  u32 target_fps = 60;
   f32 ns_per_frame = 1000000000.0 / target_fps;
   f32 fps = 60.0;
 

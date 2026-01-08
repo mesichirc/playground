@@ -37,30 +37,31 @@ graphics_mix_colors(u32 c1, u32 c2)
   );
 }
 
-void 
+void
 graphics_clip_rect(graphics_rect *rect, graphics_rect clip)
 {
-  rect->x = max(0, rect->x);
-  rect->y = max(0, rect->y);
+  i32 clip_min_x = clip.x;
+  i32 clip_max_x = clip.x + clip.w;
+  i32 clip_min_y = clip.y;
+  i32 clip_max_y = clip.y + clip.h;
 
-  i32 min_x = clip.x;
-  i32 max_x = clip.x + clip.w;
-  i32 min_y = clip.y;
-  i32 max_y = clip.y + clip.h;
+  i32 rect_min_x = rect->x;
+  i32 rect_max_x = rect->x + rect->w;
+  i32 rect_min_y = rect->y;
+  i32 rect_max_y = rect->y + rect->h;
 
-  i32 origin_x0 = rect->x;
-  rect->x = graphics_clip_numbers(rect->x, min_x, max_x);
-  i32 origin_y0 = graphics_clip_numbers(rect->y, min_y, max_y);
-  i32 origin_x1 = rect->x + rect->w;
-  origin_x1 = graphics_clip_numbers(origin_x1, min_x, max_x);
-  i32 origin_y1 = rect->y + rect->h;
-  origin_y1 = graphics_clip_numbers(origin_y1, min_y, max_y);
 
-  rect->x = origin_x0;
-  rect->w = max(0, origin_x1 - origin_x0);
-  rect->y = origin_y0;
-  rect->h = max(0, origin_y1 - origin_y0);
+  rect_min_x = graphics_clip_numbers(rect_min_x, clip_min_x, clip_max_x);
+  rect_max_x = graphics_clip_numbers(rect_max_x, clip_min_x, clip_max_x);
+  rect_min_y = graphics_clip_numbers(rect_min_y, clip_min_y, clip_max_y);
+  rect_max_y = graphics_clip_numbers(rect_max_y, clip_min_y, clip_max_y);
+
+  rect->x = rect_min_x;
+  rect->w = rect_max_x - rect_min_x;
+  rect->y = rect_min_y;
+  rect->h = rect_max_y - rect_min_y;
 }
+
 
 void
 graphics_draw_rect_opaque(graphics_bitmap *canvas, graphics_rect *rect, u32 color)
@@ -102,12 +103,6 @@ graphics_draw_rect(graphics_bitmap *canvas, i32 x, i32 y, u32 w, u32 h, u32 colo
   clip.w = cwidth;
   clip.h = cheight;
 
-  if (x < 0) {
-    rect.w += x;
-  }
-  if (y < 0) {
-    rect.h += y;
-  }
 
   graphics_clip_rect(&rect, clip);
   if (rect.w == 0 || rect.h == 0) {
@@ -703,7 +698,6 @@ graphics_draw_rect_image(
   }
 
   graphics_clip_rect(&rect, clip);
-  graphics_print_rect(rect);
   if (rect.w == 0 || rect.h == 0) {
     return;
   }

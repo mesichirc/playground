@@ -36,6 +36,62 @@ struct playground_input {
   };
 };
 
+typedef struct playground_tile_map playground_tile_map;
+struct playground_tile_map {
+  u32 *tiles;
+};
+
+typedef struct playground_world playground_world;
+struct playground_world {
+  i32 count_x;
+  i32 count_y;
+
+  f32 upper_left_x;
+  f32 upper_left_y;
+  f32 tile_width;
+  f32 tile_height;
+
+  i32 tilemap_count_x;
+  i32 tilemap_count_y;
+  playground_tile_map *tilemaps;
+};
+
+
+typedef struct playground_state playground_state;
+struct playground_state {
+  memory_arena* arena;
+  u64 current_time;
+  f32 player_x;
+  f32 player_y;
+  i32 player_tile_x;
+  i32 player_tile_y;
+  i32 player_tilemap_x;
+  i32 player_tilemap_y;
+};
+
+typedef struct playground_cannonical_position playground_cannonical_position;
+struct playground_cannonical_position {
+  i32 tilemap_x;
+  i32 tilemap_y;
+
+  i32 tile_x;
+  i32 tile_y;
+
+  f32 x;
+  f32 y;
+};
+
+typedef struct playground_raw_position playground_raw_position;
+struct playground_raw_position {
+  i32 tilemap_x;
+  i32 tilemap_y;
+
+  f32 x;
+  f32 y;
+};
+
+inline playground_cannonical_position playground_get_cannonical_position(playground_world *world, playground_raw_position pos);
+
 void playground_init(
     memory_arena *arena,
     u64 ctime,

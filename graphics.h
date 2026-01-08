@@ -78,6 +78,7 @@ graphics_point graphics_draw_debug_string_rainbow(graphics_bitmap *canvas, i32 x
 void graphics_draw_debug_glyph_rainbow(graphics_bitmap *canvas, i32 x, i32 y, u8 *glyph, u16 w, u16 h, u32 color[4], u32 size);
 inline void graphics_draw_rect_image(graphics_bitmap *canvas, i32 x, i32 y, u32 w, u32 h, graphics_bitmap *bitmap, b32 uniform_scale, b32 right_to_left);
 inline graphics_point graphics_measure_debug_string(string8 str, u32 size);
+inline void graphics_print_rect(graphics_rect rect);
 
 // Macros
 

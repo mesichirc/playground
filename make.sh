@@ -1,7 +1,7 @@
 #/bin/sh
 
 CC=clang
-LFLAGS="-lX11 -lXrandr -lm -ldl -lpthread -lXext"
+LFLAGS="-lX11 -lXrandr -lm"
 BUNDLE="./playground"
 EXE="plg"
 FONTS="fonts"
@@ -29,28 +29,13 @@ prepare_fonts()
     "./$FONTS_EXE" "$DEBUG_FONT_OUT"
 }
 
-prepare_wayland()
-{
-	wayland-scanner client-header /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ./wayland/xdg-shell.h
-	wayland-scanner public-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ./wayland/xdg-shell.c
-	wayland-scanner client-header /usr/share/wayland-protocols/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml ./wayland/xdg-decoration-unstable-v1.h
-	wayland-scanner public-code /usr/share/wayland-protocols/staging/xdg-toplevel-icon/xdg-toplevel-icon-v1.xml ./wayland/xdg-toplevel-icon-v1.c
-	wayland-scanner client-header /usr/share/wayland-protocols/staging/xdg-toplevel-icon/xdg-toplevel-icon-v1.xml ./wayland/xdg-toplevel-icon-v1.h
-	wayland-scanner public-code /usr/share/wayland-protocols/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml ./wayland/xdg-decoration-unstable-v1.c
-	wayland-scanner client-header /usr/share/wayland-protocols/unstable/relative-pointer/relative-pointer-unstable-v1.xml ./wayland/relative-pointer-unstable-v1.h
-	wayland-scanner public-code /usr/share/wayland-protocols/unstable/relative-pointer/relative-pointer-unstable-v1.xml ./wayland/relative-pointer-unstable-v1.c
-	wayland-scanner client-header /usr/share/wayland-protocols/unstable/pointer-constraints/pointer-constraints-unstable-v1.xml ./wayland/pointer-constraints-unstable-v1.h
-	wayland-scanner public-code /usr/share/wayland-protocols/unstable/pointer-constraints/pointer-constraints-unstable-v1.xml ./wayland/pointer-constraints-unstable-v1.c
-	wayland-scanner client-header /usr/share/wayland-protocols/unstable/xdg-output/xdg-output-unstable-v1.xml ./wayland/xdg-output-unstable-v1.h
-	wayland-scanner public-code /usr/share/wayland-protocols/unstable/xdg-output/xdg-output-unstable-v1.xml ./wayland/xdg-output-unstable-v1.c
-}
 
 build_linux()
 {
 	prepare_fonts
   rm -fr $BUNDLE/assets
   cp -fr ./assets "$BUNDLE/assets"
-  clang -O2 -o "$BUNDLE/$EXE" $LFLAGS linux.c
+  clang -g -o "$BUNDLE/$EXE" $LFLAGS linux.c
 }
 
 case $1 in
